@@ -1,0 +1,6 @@
+sentence-transformers==3.0.1
+faiss-cpu==1.8.0
+numpy
+scipy
+tqdm
+python-dateutil

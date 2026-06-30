@@ -1,0 +1,29 @@
+{
+  "role_summary": "Senior AI Engineer at Redrob AI, Series A startup. Own the intelligence layer — ranking, retrieval, matching systems. 5-9 years experience. Product-company experience required.",
+  "must_have_skills": [
+    "embeddings-based retrieval systems (sentence-transformers, BGE, E5, OpenAI)",
+    "vector databases (Pinecone, Weaviate, Qdrant, Milvus, FAISS, Elasticsearch)",
+    "Python (strong)",
+    "evaluation frameworks for ranking (NDCG, MRR, MAP, A/B testing)"
+  ],
+  "nice_to_have_skills": [
+    "LLM fine-tuning (LoRA, QLoRA, PEFT)",
+    "learning-to-rank models (XGBoost, neural)",
+    "HR-tech or marketplace product experience",
+    "distributed systems / large-scale inference",
+    "open-source contributions in AI/ML"
+  ],
+  "disqualifiers": [
+    "pure research background without production deployment",
+    "only API-wrapper LLM experience under 12 months",
+    "not written production code in 18 months",
+    "only consulting firms (TCS, Infosys, Wipro, Accenture, Cognizant, Capgemini)",
+    "primary expertise in CV, speech, robotics without NLP/IR",
+    "closed-source only work for 5+ years with no external validation"
+  ],
+  "location_preference": ["Pune", "Noida", "Hyderabad", "Mumbai", "Delhi NCR", "India"],
+  "experience_range_years": [5, 9],
+  "company_type_preference": "product companies, AI startups (not pure services)",
+  "behavioral_signals_weight": "high — inactive candidates, low response rate, long notice should be down-weighted",
+  "embedding_text": "Senior AI Engineer founding team embedding retrieval ranking search vector database sentence-transformers BGE E5 FAISS Pinecone Qdrant Milvus Elasticsearch hybrid search BM25 reranking LLM fine-tuning LoRA evaluation NDCG MRR A/B testing production deployment product company Python NLP information retrieval recommendation system"
+}
