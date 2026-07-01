@@ -16,13 +16,10 @@ python explore.py --file ../data/candidates.jsonl --limit 500
 ```
 
 ## Run the full pipeline
-
-1. Fill in `jd_parsed.json` with the parsed job description fields.
-2. Run:
+From the working directory, Run:
 
 ```bash
-cd src
-python ranker.py --candidates ../data/candidates.jsonl --jd ../jd_parsed.json --output ../output/ranked.csv
+python ./src/ranker.py --candidates ./data/candidates.jsonl --jd ./jd_parsed.json --out ./output/ranked.csv
 ```
 
 ## Project layout
@@ -31,10 +28,12 @@ python ranker.py --candidates ../data/candidates.jsonl --jd ../jd_parsed.json --
 redrob_ranker/
   data/               # place candidates.jsonl here
   src/
+    keywords.py       # Contains keywords consts for filters.py and embedder.py
+    helper.py         # Contains helper functions for filters.py and embedder.py
     filters.py        # Task 1: hard metadata filters
     embedder.py       # Task 2: sentence-transformer embedding + cosine sim
-    ranker.py         # orchestrator
-    explore.py        # EDA script (run first)
-  jd_parsed.json      # parsed JD — fill manually
+    ranker.py         # Main file
+
+  jd_parsed.json      # parsed JD - filled manually from job_descriptions.docx
   requirements.txt
 ```
