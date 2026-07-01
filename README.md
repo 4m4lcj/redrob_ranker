@@ -8,13 +8,6 @@ pip install -r requirements.txt
 
 Copy (or symlink) `candidates.jsonl` into `data/`.
 
-## Explore the data
-
-```bash
-cd src
-python explore.py --file ../data/candidates.jsonl --limit 500
-```
-
 ## Run the full pipeline
 From the working directory, Run:
 
