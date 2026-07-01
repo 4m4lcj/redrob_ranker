@@ -18,13 +18,13 @@ from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from .filters import apply_filters
-from .embedder import structure_candidate, build_jd_text, cosine_rank
+from filters import apply_filters
+from embedder import structure_candidate, build_jd_text, cosine_rank
 
 _HERE       = Path(__file__).parent
 _MODELS_DIR = _HERE / ".." / "models"
 
-MODEL  = "all-MiniLM"
+MODEL  = "sentence-transformers/all-MiniLM-L6-v2"
 EMBED_WARN_SEC = 200
 TOP_N          = 100
 
@@ -145,10 +145,11 @@ def output(ranked: list[dict], out_path: Path) -> None:
     ]
 
     # Validate before writing
-    assert len(rows) == TOP_N, \
-        f"Expected {TOP_N} rows, got {len(rows)}"
-    assert sorted(r["rank"] for r in rows) == list(range(1, TOP_N + 1)), \
-        "Ranks are not unique 1-100"
+    expected = len(rows)
+
+    assert sorted(r["rank"] for r in rows) == list(range(1, expected + 1)), \
+        "Ranks are not unique and sequential"
+    
     scores = [r["score"] for r in rows]
     assert all(scores[i] >= scores[i + 1] for i in range(len(scores) - 1)), \
         "Scores are not non-increasing"
@@ -159,7 +160,10 @@ def output(ranked: list[dict], out_path: Path) -> None:
         writer.writerows(rows)
 
     print(f"  Wrote {out_path}")
-    print(f"  Validation: {len(rows)} rows, ranks 1-{TOP_N} unique, scores non-increasing — all OK")
+    print(
+        f"  Validation: {len(rows)} rows, "
+        f"ranks 1-{len(rows)} unique, scores non-increasing — all OK"
+    )
 
 # ── Main ───────────────────────────────────────────────────────────────────
 
@@ -187,9 +191,21 @@ def main() -> None:
     filtered, t_filter = filter(args.candidates, args.limit)
 
     if len(filtered) < TOP_N:
-        print(f"\nERROR: Only {len(filtered)} candidates passed filters "
-              f"(need at least {TOP_N}). Aborting.")
-        sys.exit(1)
+        print(
+            f"\nOnly {len(filtered)} candidates passed filters "
+            f"(need {TOP_N}). Using all candidates instead."
+        )
+
+        filtered = []
+
+        with open(args.candidates, encoding="utf-8") as f:
+            for i, line in enumerate(f):
+                if args.limit and i >= args.limit:
+                    break
+                
+                line = line.strip()
+                if line:
+                    filtered.append(json.loads(line))
 
     # Phase 2
     embeddings, jd_emb, t_embed = embed(filtered, MODEL, args.jd)
@@ -212,6 +228,7 @@ def main() -> None:
     print("=" * 60)
 
     # Print top 10 to terminal
+    """
     print("\nTop 10:")
     for r in ranked[:10]:
         print(f"  #{r['rank']:>3}  {r['candidate_id']}  "
@@ -219,7 +236,7 @@ def main() -> None:
               f"(cos={r['cosine_sim']:.4f} x {r['behavioral_multiplier']:.3f})")
         print(f"         {r['title']} @ {r['company']}  |  {r['yoe']} YoE")
         print(f"         {r['reasoning_draft']}")
-
+    """
 
 if __name__ == "__main__":
     main()

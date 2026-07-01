@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from .keywords import PURE_SERVICES
+from keywords import PURE_SERVICES
 
 _TODAY = date(2026, 6, 18)
 

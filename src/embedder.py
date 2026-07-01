@@ -9,8 +9,8 @@ from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from .keywords import RELEVANT_SKILLS
-from .helpers import _parse_date, _days_since, structure_candidate, build_jd_text
+from keywords import RELEVANT_SKILLS
+from helpers import _parse_date, _days_since, structure_candidate, build_jd_text
 
 _MODEL_NAME        = "sentence-transformers/all-MiniLM-L6-v2"
 _TOP_N             = 100

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from .helpers import _parse_date, _days_since, _contains_keyword
-from .keywords import PURE_SERVICES, CORE_AI_SKILLS, RELEVANT_SKILLS, NON_TECH_TITLE_KEYWORDS, RELEVANT_ASSESSED
+from helpers import _parse_date, _days_since, _contains_keyword
+from keywords import PURE_SERVICES, CORE_AI_SKILLS, RELEVANT_SKILLS, NON_TECH_TITLE_KEYWORDS, RELEVANT_ASSESSED
 
 # ── Check 1: title / headline domain mismatch ──────────────────────────────
 
@@ -124,12 +124,15 @@ def check_open_to_work_salary_honeypot(candidate: dict) -> bool:
 
 def check_location(candidate: dict) -> bool:
     """Reject non-India candidates who are explicitly not willing to relocate."""
+
     profile  = candidate.get("profile", {})
     signals  = candidate.get("redrob_signals", {})
     country  = (profile.get("country") or "").strip()
     relocate = signals.get("willing_to_relocate")  # bool or None
+
     if country != "India" and relocate is False:
         return False
+    
     return True
 
 
