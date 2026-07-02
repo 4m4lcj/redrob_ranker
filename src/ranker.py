@@ -8,7 +8,8 @@ from tqdm import tqdm
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from filters import apply_filters
-from embedder import structure_candidate, build_jd_text, cosine_rank
+from helpers import structure_candidate, build_jd_text
+from embedder import cosine_rank
 
 _HERE       = Path(__file__).parent
 _MODELS_DIR = _HERE / ".." / "models"
@@ -85,7 +86,7 @@ def embed(filtered: list[dict], model_shortname: str, jd_path: str, batch_size: 
     print(f"\nEmbedding {len(filtered):,} candidates with model={model_shortname} ({source})...")
 
     t0    = time.perf_counter()
-    model = SentenceTransformer(model_path)
+    model = SentenceTransformer(model_path, device = "cpu")
 
     texts = [structure_candidate(c)["combined_text"] for c in tqdm(filtered, desc="  structuring", unit="cand", leave=False)]
 
