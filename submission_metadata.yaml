@@ -1,0 +1,89 @@
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "3 dav + 1 foreigner"  # Used in leaderboard and announcements
+
+primary_contact:
+  name: "Amal Shadh K"
+  email: "amalshadhkolakkadan240@gmail.com"   # Used for all organizer communication
+  phone: "+91-9746263800"
+
+team_members:
+  - name: "Umme Hani Chakkiwala"
+    email: "25b4510@iitb.ac.in"
+  - name: "Vishakha Arekar"
+    email: "arekarvishakha005@gmail.com"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/4m4lcj/redrob_ranker"
+# Required. Must be reachable. Private repos OK if you can grant organizer
+# access at Stage 3 (the email to add will be communicated then).
+
+parsed_jd_Link: "https://drive.google.com/drive/folders/18fzmRYZuQjfSN5CEhWBUz0FP9cyUFHNM?usp=sharing"
+# Required for sandbox demo for JD embeddings
+
+sandbox_link: "https://huggingface.co/spaces/CJ4m4l/ranker_sandbox"
+# Required. A working hosted environment where the ranker can be run on a small
+# candidate sample. See Section 10.5 of submission_spec.md for acceptable
+# platforms (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, Binder).
+
+reproduce_command: "python ./src/ranker.py --candidates ./data/candidates.jsonl --jd ./jd_parsed.json --out ./output/ranked.csv"
+# The single command that produces submission.csv from candidates.jsonl.
+# Should run end-to-end within 5 minutes on CPU with 16GB RAM and no network.
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "ASUS Vivobook 16 (Intel Core 7 240H)" # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
+  cpu_cores: 10                                   # Number of CPU cores used
+  ram_gb: 16                                      # Available RAM in GB
+  python_version: "3.12.0"                        # python --version
+  os: "Windows 11 25H2"                           # Or "Ubuntu 22.04 LTS", etc.
+  uses_gpu_for_inference: false                   # Must be false — see compute constraints
+  has_network_during_ranking: false               # Must be false — no API calls during ranking
+  pre_computation_required: false                 # true if you pre-compute embeddings or train models offline
+  pre_computation_time_minutes: 0.4               # Approximate, if applicable
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+# Transparency only — declared use is NOT penalized. Be honest. Stage 5 interview
+# may verify these declarations against your code; declarations that contradict
+# your code or your interview are flagged.
+ai_tools_used:
+  - "Claude"        # e.g. for architecture discussion, code review
+  # Other options: "ChatGPT", "Cursor", "Gemini", "Codeium", "Other", "None"
+
+ai_usage_summary: |
+  - "Used Claude for code review, quick generation of small fucntions, architectural discussion."
+
+# ============================================================================
+# Approach summary (optional but recommended)
+# ============================================================================
+methodology_summary: |
+  The solution uses a two-stage candidate ranking pipeline. 
+  First, rule-based filtering removes candidates with eligibility 
+  mismatches and low-quality or inconsistent profiles using metadata 
+  and behavioral signals. The remaining candidates are converted 
+  into structured text and embedded alongside the parsed job 
+  description using a Sentence Transformer model. Cosine similarity 
+  is then used to measure semantic relevance, and candidates 
+  are ranked in descending order of similarity. This approach
+  combines the efficiency and interpretability of rule-based
+  filtering with the contextual understanding of embedding-based 
+  semantic matching, providing more accurate retrieval than keyword 
+  matching while remaining lightweight. Runtime is approximately 
+  21.4 seconds on CPU for the evaluation dataset.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true        # I have read submission_spec.md in full
+  code_is_original_work: true       # My code is my team's original work (using AI as a tool is fine)
+  no_collusion: true                # I have not coordinated my submission with other teams
+  honeypot_check_done: true        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
+  reproduction_tested: true         # I have tested that my reproduce_command runs end-to-end
