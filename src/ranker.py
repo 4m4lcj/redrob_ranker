@@ -1,14 +1,3 @@
-"""
-Redrob Senior AI Engineer — end-to-end ranking pipeline.
-
-Usage:
-    python src/ranker.py --candidates data/candidates.jsonl --out submission.csv
-    python src/ranker.py --candidates data/candidates.jsonl --out out.csv --model bge-small
-    python src/ranker.py --candidates data/candidates.jsonl --out out.csv --limit 5000
-
-Pre-requisite (network required, run once):
-    python src/download_models.py
-"""
 from __future__ import annotations
 import argparse, csv, json, os, sys, time
 from pathlib import Path
@@ -104,6 +93,7 @@ def embed(filtered: list[dict], model_shortname: str, jd_path: str, batch_size: 
 
     with open(jd_path, encoding="utf-8") as f:
         jd = json.load(f)
+
     jd_emb = model.encode([build_jd_text(jd)], normalize_embeddings=True)[0]
 
     elapsed = time.perf_counter() - t0
@@ -207,16 +197,12 @@ def main() -> None:
                 if line:
                     filtered.append(json.loads(line))
 
-    # Phase 2
     embeddings, jd_emb, t_embed = embed(filtered, MODEL, args.jd)
 
-    # Phase 3
     ranked, t_rank = rank(filtered, embeddings, jd_emb)
-
-    # Phase 4
+    
     output(ranked, Path(args.out))
 
-    # Summary
     wall_time = time.perf_counter() - wall_start
 
     print()

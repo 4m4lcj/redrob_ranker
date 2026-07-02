@@ -8,6 +8,7 @@ _MAX_COMBINED_CHARS = 1900   # ~512 tokens proxy for all-MiniLM wordpiece
 def _parse_date(s: str | None) -> date | None:
     if not s:
         return None
+    
     try:
         return datetime.strptime(s[:10], "%Y-%m-%d").date()
     except Exception:
@@ -16,10 +17,12 @@ def _parse_date(s: str | None) -> date | None:
 def _days_since(d: date | None) -> int:
     if d is None:
         return 0
+    
     return (_TODAY - d).days
 
 def _contains_keyword(text: str, keywords: set[str]) -> bool:
     low = text.lower()
+
     return any(kw in low for kw in keywords)
 
 def structure_candidate(candidate: dict) -> dict:
@@ -41,6 +44,7 @@ def structure_candidate(candidate: dict) -> dict:
     # ── block_summary ──────────────────────────────────────────────────────
     headline = (profile.get("headline") or "").strip()
     summary  = (profile.get("summary")  or "").strip()
+
     raw = f"{headline}. {summary}" if headline and summary else (headline or summary)
     block_summary = raw[:300]
 
@@ -49,27 +53,20 @@ def structure_candidate(candidate: dict) -> dict:
         prof = s.get("proficiency", "")
         end  = s.get("endorsements") or 0
         dur  = s.get("duration_months") or 0
+
         if prof == "beginner" and dur < 6:
             return False
         return end > 0 or dur > 6
 
-    kept = sorted(
-        [s for s in skills if _skill_passes(s)],
-        key=lambda s: (s.get("endorsements") or 0),
-        reverse=True,
-    )
-    parts = [
-        f"{s.get('name', '')} ({s.get('proficiency', '')}, {s.get('duration_months', 0)}mo)"
-        for s in kept
-    ]
+    kept = sorted([s for s in skills if _skill_passes(s)], key=lambda s: (s.get("endorsements") or 0), reverse=True)
+
+    parts = [f"{s.get('name', '')} ({s.get('proficiency', '')}, {s.get('duration_months', 0)}mo)" for s in kept]
     block_skills = ("Skills: " + ", ".join(parts)) if parts else "Skills: none"
 
     # ── block_work ─────────────────────────────────────────────────────────
-    product_roles = [
-        h for h in career
-        if not any(svc in h.get("company", "").lower() for svc in PURE_SERVICES)
-    ]
+    product_roles = [h for h in career if not any(svc in h.get("company", "").lower() for svc in PURE_SERVICES)]
     services_only = len(product_roles) == 0
+
     roles_to_use  = career if services_only else product_roles
 
     role_parts = []
@@ -77,6 +74,7 @@ def structure_candidate(candidate: dict) -> dict:
         title   = h.get("title", "")
         company = h.get("company", "")
         desc    = (h.get("description") or "").strip()[:150]
+        
         role_parts.append(f"{title} at {company}: {desc}")
 
     block_work = " | ".join(role_parts)
@@ -95,6 +93,7 @@ def structure_candidate(candidate: dict) -> dict:
     # ── combined_text ──────────────────────────────────────────────────────
     prefix   = f"{block_summary} | {block_skills} | "
     combined = prefix + block_work
+
     if len(combined) > _MAX_COMBINED_CHARS:
         remaining = max(0, _MAX_COMBINED_CHARS - len(prefix))
         combined  = prefix + block_work[:remaining]
@@ -110,5 +109,6 @@ def structure_candidate(candidate: dict) -> dict:
 def build_jd_text(jd: dict) -> str:
     if jd.get("embedding_text"):
         return jd["embedding_text"]
+    
     skills = " ".join(jd.get("must_have_skills", []) + jd.get("nice_to_have_skills", []))
     return f"{jd.get('role_summary', '')} {skills}"

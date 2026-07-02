@@ -16,10 +16,6 @@ RELEVANT_SKILLS = {
     "wandb", "mlflow", "a/b testing", "feature store"
 }
 
-# Skills that are unambiguously in the AI/ML/NLP/Search/Retrieval space.
-# A candidate must have at least ONE of these to pass — adjacent-domain skills
-# like "spark", "kafka", "search engine marketing" don't count here.
-
 CORE_AI_SKILLS = {
     "machine learning", "deep learning", "nlp", "embeddings", "llm",
     "rag", "fine-tuning", "lora", "qlora", "transformers", "bert",

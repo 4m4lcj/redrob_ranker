@@ -1,4 +1,3 @@
-# Task 2: candidate block structuring + embedding + cosine-based ranking
 from __future__ import annotations
 import json, os, sys
 from pathlib import Path
@@ -45,6 +44,7 @@ def embed_candidates(filtered_jsonl_path: str, model_name: str, batch_size: int 
 
             c = json.loads(line)
             candidates.append(c)
+            
             texts.append(structure_candidate(c)["combined_text"])
 
     print(f"  {len(candidates):,} candidates structured  "
@@ -72,8 +72,10 @@ def embed_jd(jd_parsed_path: str, model_name: str, _model: SentenceTransformer |
         jd = json.load(f)
 
     jd_text = build_jd_text(jd)
+    
     if _model is None:
         _model = SentenceTransformer(model_name)
+    
     emb = _model.encode([jd_text], normalize_embeddings=True)
     return np.array(emb[0])
 
@@ -95,21 +97,16 @@ def generate_reasoning_draft(candidate: dict, score: float, rank: int) -> str:
     country = profile.get("country", "")
 
     # Top relevant skills by endorsement count
-    rel = sorted(
-        [s for s in skills if s.get("name", "").lower() in RELEVANT_SKILLS],
-        key=lambda s: s.get("endorsements") or 0,
-        reverse=True,
-    )[:3]
-    skill_str = (
-        ", ".join(f"{s['name']} ({s.get('endorsements', 0)} end.)" for s in rel)
-        if rel else "some relevant skills"
-    )
+    rel = sorted([s for s in skills if s.get("name", "").lower() in RELEVANT_SKILLS], key=lambda s: s.get("endorsements") or 0, reverse=True)[:3]
+    skill_str = (", ".join(f"{s['name']} ({s.get('endorsements', 0)} end.)" for s in rel) if rel else "some relevant skills")
 
     # YoE vs JD range (5-9)
     if yoe < 5:
         yoe_tag = f"{yoe:.0f}yr (below range)"
+
     elif yoe > 9:
         yoe_tag = f"{yoe:.0f}yr (above range)"
+
     else:
         yoe_tag = f"{yoe:.0f}yr"
 
@@ -117,8 +114,10 @@ def generate_reasoning_draft(candidate: dict, score: float, rank: int) -> str:
     flags: list[str] = []
     if signals.get("open_to_work_flag"):
         flags.append("open to work")
+
     if signals.get("willing_to_relocate"):
         flags.append("relocatable")
+
     notice = signals.get("notice_period_days") or 0
     if notice <= 30:
         flags.append(f"{notice}d notice")
@@ -127,8 +126,10 @@ def generate_reasoning_draft(candidate: dict, score: float, rank: int) -> str:
     concerns: list[str] = []
     if notice > 90:
         concerns.append(f"{notice}d notice")
+
     if country != "India":
         concerns.append(f"based in {country}")
+
     days_inactive = _days_since(_parse_date(signals.get("last_active_date")))
     if days_inactive > 90:
         concerns.append(f"inactive {days_inactive}d")
@@ -136,6 +137,7 @@ def generate_reasoning_draft(candidate: dict, score: float, rank: int) -> str:
     draft = f"{yoe_tag} {title} at {company}; skills: {skill_str}"
     if flags:
         draft += "; " + ", ".join(flags)
+
     if concerns:
         draft += " | concerns: " + ", ".join(concerns)
 
@@ -162,8 +164,10 @@ def cosine_rank(candidate_list: list[dict], embeddings: np.ndarray,jd_embedding:
         days_inactive = _days_since(_parse_date(sig.get("last_active_date")))
         if days_inactive > 180:
             mult *= 0.60
+
         elif days_inactive > 90:
             mult *= 0.80
+
         elif days_inactive < 30:
             mult *= 1.05
 
@@ -205,10 +209,8 @@ def cosine_rank(candidate_list: list[dict], embeddings: np.ndarray,jd_embedding:
     top = results[:_TOP_N]
     for rank, r in enumerate(top, 1):
         r["rank"] = rank
-        cand = candidate_list[
-            next(i for i, c in enumerate(candidate_list)
-                 if c.get("candidate_id") == r["candidate_id"])
-        ]
+        cand = candidate_list[next(i for i, c in enumerate(candidate_list) if c.get("candidate_id") == r["candidate_id"])]
+
         r["reasoning_draft"] = generate_reasoning_draft(cand, r["score"], rank)
 
     return top
@@ -226,7 +228,7 @@ class Embedder:
         return candidate_embs @ jd_emb
 
 # ── Main: full pipeline ────────────────────────────────────────────────────
-
+"""
 if __name__ == "__main__":
     MODEL = "sentence-transformers/all-MiniLM-L6-v2"   # benchmark winner
 
@@ -262,3 +264,5 @@ if __name__ == "__main__":
         writer.writeheader()
         writer.writerows(ranked)
     print(f"Saved {len(ranked)} ranked candidates to {_output_path}")
+
+"""
